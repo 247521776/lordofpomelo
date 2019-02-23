@@ -21,15 +21,17 @@ NND.init = function(app){
  * 
  */
 NND.query = function(sql, args, cb){
-	_pool.acquire(function(err, client) {
-		if (!!err) {
-			console.error('[sqlqueryErr] '+err.stack);
-			return;
-		}
+	_pool.acquire().then(function(client) {
 		client.query(sql, args, function(err, res) {
 			_pool.release(client);
 			cb(err, res);
 		});
+	})
+	.catch((err)=> {
+		if (!!err) {
+			console.error('[sqlqueryErr] '+err.stack);
+			return;
+		}
 	});
 };
 
